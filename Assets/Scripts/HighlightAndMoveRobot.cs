@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class HighlightAndMoveRobot : MonoBehaviour
 {
@@ -18,7 +19,7 @@ public class HighlightAndMoveRobot : MonoBehaviour
     private Vector3 leftArmDetachedPos;
     private readonly float armOffset = .025f;
     private readonly float lerpMovementSpeed = 50f;
-    public Text text;
+    public TMP_Text text;
     private bool attached = true;
 
     void Awake()
