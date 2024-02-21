@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
+//using TMPro;
 
 public class HighlightAndMoveRobot : MonoBehaviour
 {
-    public Material highlightMaterial;
+    private Material highlightMaterial;
     public GameObject leftArmRoot;
     private enum Selection{Torso, LeftArm, None };
     private Selection selection;
@@ -19,17 +19,25 @@ public class HighlightAndMoveRobot : MonoBehaviour
     private Vector3 leftArmDetachedPos;
     private readonly float armOffset = .025f;
     private readonly float lerpMovementSpeed = 50f;
-    public TMP_Text text;
+    // Commenting out because it would not compile TMP after adding "Scripts" assembly definition
+    //public TMP_Text text; 
+    public Text text;
     private bool attached = true;
 
     void Awake()
     {
         selection = Selection.None;
         leftArmStartPos = leftArmRoot.transform.localPosition;
+        LoadMaterial("Materials", "MHighlight");
         ChangeText();
     }
 
     void Update()
+    {
+        RaycastAndHighlight();
+        MouseInput();
+    }
+    private void RaycastAndHighlight()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
@@ -49,14 +57,16 @@ public class HighlightAndMoveRobot : MonoBehaviour
             {
                 DisableHighlight();
                 selection = Selection.None;
-            }   
+            }
         }
-        else if(selection != Selection.None && !moving)
+        else if (selection != Selection.None && !moving)
         {
             DisableHighlight();
             selection = Selection.None;
         }
-
+    }
+    private void MouseInput()
+    {
         //Change text when detached and store detached arm position
         if (Input.GetMouseButtonDown(0))
         {
@@ -76,7 +86,7 @@ public class HighlightAndMoveRobot : MonoBehaviour
         // Move Robot when holding left mouse button
         if (Input.GetMouseButton(0))
         {
-            if(highlighted != null)
+            if (highlighted != null)
             {
                 moving = true;
                 Vector3 position = Input.mousePosition;
@@ -94,7 +104,7 @@ public class HighlightAndMoveRobot : MonoBehaviour
         {
             moving = false;
             // Check that the arm is close enough to starting position to snap back into place
-            if(selection == Selection.LeftArm)
+            if (selection == Selection.LeftArm)
             {
                 if ((leftArmRoot.transform.localPosition.x > leftArmStartPos.x - armOffset) && leftArmRoot.transform.localPosition.x < leftArmStartPos.x + armOffset)
                 {
@@ -105,7 +115,7 @@ public class HighlightAndMoveRobot : MonoBehaviour
                         ChangeText();
                     }
                 }
-            }     
+            }
         }
     }
     private void Highlight(Selection enumSelection, Transform transformSelection)
@@ -140,7 +150,7 @@ public class HighlightAndMoveRobot : MonoBehaviour
             highlighted = null;
         }
     }
-    private void ChangeText()
+    public void ChangeText()
     {
         if (text != null)
         {
@@ -153,5 +163,15 @@ public class HighlightAndMoveRobot : MonoBehaviour
                 text.text = "Detached";
             }
         } 
+    }
+    public void SetAttached(bool bAttached)
+    {
+        attached = bAttached;
+    }
+    // Load Material From Resources Folder
+    private void LoadMaterial(string folderName, string materialName)
+    {
+        string path = folderName + "/" + materialName;
+        highlightMaterial = Resources.Load<Material>(path);
     }
 }
